@@ -1,105 +1,102 @@
-var request = require('request');
-var cheerio = require('cheerio');
-var URL = require('url-parse');
-var Promise = require('bluebird');
-var Watson = require('./watson');
+exports.keywords = [
+'beyonce', 'bruno mars', 'apple'
+]
 
-var Sites = require('./Sites/index');
+// var request = require('request');
+// var cheerio = require('cheerio');
+// var URL = require('url-parse');
+// var Promise = require('bluebird');
+// var Watson = require('./watson');
 
-var SEARCH_WORD = {
-  'aliens': [],
-  'butter': [],
-  'people': []
-};
+// var Sites = require('./Sites/index');
 
-var MAX_PAGES_TO_VISIT = 10;
 
-var pagesVisited = {};
-var pagesToVisit = [];
-var numPagesVisited = 0;
+// var SEARCH_WORD = {
+//   'this': [],
+//   'push': [],
+// };
 
-Promise.each( Sites.sites, (site) => {
-  site = 'https://' + site;
-  var url = new URL(site);
-  var baseUrl = url.protocol + "//" + url.hostname;
-  pagesToVisit.push(site);
-  crawl();
-});
+// var MAX_PAGES_TO_VISIT = 10;
+// var numPagesVisited = 0;
+// var pagesVisited = {};
+// var pagesToVisit = [];
+// var url, baseUrl;
 
-function crawl() {
-  if(numPagesVisited >= MAX_PAGES_TO_VISIT) {
-    console.log("Reached max limit of number of pages to visit.");
-    return;
-  }
-  var nextPage = pagesToVisit.pop();
-  if (nextPage in pagesVisited) {
-    // We've already visited this page, so repeat the crawl
-    crawl();
-  } else if(nextPage === undefined) {
-    Watson.toneAnalysis(SEARCH_WORD);
-    return;
-  } else {
-    // New page we haven't visited
-    visitPage(nextPage, crawl);
-  }
-}
+// Promise.each( Sites.sites, (site) => {
+//   site = 'https://' + site;
+//   url = new URL(site);
+//   baseUrl = url.protocol + '//' + url.hostname;
+//   pagesToVisit.push(site);
+//   crawl();
+// });
 
-async function visitPage(url, callback) {
-  // Add page to our set
-  pagesVisited[url] = true;
-  numPagesVisited++;
+// function crawl() {
+//   if(numPagesVisited >= MAX_PAGES_TO_VISIT) {
+//     console.log("Reached max limit of number of pages to visit.");
+//     return;
+//   }
+//   var nextPage = pagesToVisit.pop();
+//   if(nextPage === undefined) {
+//     Watson.toneAnalysis(SEARCH_WORD);
+//     return;
+//   }
+//   if (nextPage in pagesVisited) {
+//     crawl();
+//   } else {
+//     visitPage(nextPage, crawl);
+//   }
+// }
 
-  // Make the request
-  console.log("Visiting page " + url);
-  var test = await request(url, function(error, response, body) {
-      // Check status code (200 is HTTP OK)
-      console.log("Status code: " + response.statusCode);
-      if(response.statusCode !== 200) {
-        callback();
-        return;
-      }
-      // Parse the document body
-      var $ = cheerio.load(body, {
-        ignoreWhitespace: true
-      });
-      var wordsFound = searchForWord($, SEARCH_WORD);
-      if(wordsFound.length > 0) {
-        var captured = captureDomNodes(wordsFound, $);
-        callback();
-      } else {
-        // collectInternalLinks($);
-        // In this short program, our callback is just calling crawl()
-        callback();
-      }
-  });
-}
+// function visitPage(url, callback) {
+//   pagesVisited[url] = true;
+//   numPagesVisited++;
 
-function searchForWord($, words) {
-  var bodyText = $('html > body').text().toLowerCase();
-  // return(bodyText.indexOf(word.toLowerCase()) !== -1);
-  var foundKeywords = [];
-  for(var property in words){
-    var lowerProperty = property.toLowerCase();
-    if(bodyText.includes(lowerProperty)){
-      foundKeywords.push(lowerProperty);
-    }
-  }
-  return foundKeywords;
-}
+//   console.log("Visiting page " + url);
+//   request(url, function(error, response, body) {
+//       if(response.statusCode !== 200) {
+//         callback();
+//         return;
+//       }
+//       var $ = cheerio.load(body, {
+//         ignoreWhitespace: true
+//       });
+//       var wordsFound = searchForWord($, SEARCH_WORD);
+//       if(wordsFound.length > 0) {
+//         var captured = captureDomNodes(url, wordsFound, $);
+//         callback();
+//       } else {
+//         // collectInternalLinks($);
+//         callback();
+//       }
+//   });
+// }
 
-function captureDomNodes(wordsFound, $, isChild) {
-  var aBody = $('html > body').children().find('a');
-  aBody.each(function(i, element) {
-    var aElement = $(this).text().trim().toLowerCase();
-    console.log(aElement);
-    wordsFound.forEach(function(word) {
-      if(aElement.includes(word)) {
-        console.log('word exist: ', word);        
-        SEARCH_WORD[word].push(aElement);
-      }
-    });
-  }); 
-}
+// function searchForWord($, words) {
+//   var bodyText = $('html > body').text().toLowerCase();
+//   var foundKeywords = [];
+//   for(var property in words){
+//     var lowerProperty = property.toLowerCase();
+//     if(bodyText.includes(lowerProperty)){
+//       foundKeywords.push(lowerProperty);
+//     }
+//   }
+//   return foundKeywords;
+// }
+
+// function captureDomNodes(url, wordsFound, $, isChild) {
+//   var aBody = $('html > body').children().find('a');
+//   aBody.each(function(i, element) {
+//     var aElement = $(this).text().trim().toLowerCase();
+//     wordsFound.forEach(function(word) {
+//       if(aElement.includes(word)) {
+//         var objContainer = {};
+//         objContainer.text = aElement;
+//         objContainer.source = url;
+//         SEARCH_WORD[word].push(objContainer);
+//       }
+//     });
+//   }); 
+// }
 
 // function collectInternalLinks($) {
 //     var relativeLinks = $("a[href^='/']");
