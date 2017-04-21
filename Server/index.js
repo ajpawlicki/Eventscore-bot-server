@@ -1,8 +1,12 @@
+'user strict';
+
+require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
 var Index = require('../Crawler/index');
 var Promise = require('bluebird');
 var Watson = require('../Crawler/watson');
+var db = require('../Database/config');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
