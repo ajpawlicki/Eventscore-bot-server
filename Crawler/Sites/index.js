@@ -13,38 +13,42 @@ var sites = [
 
 var url, baseUrl;
 
-Promise.all(sites.map((site) => {
-  return new Promise((resolve, reject) => {
-    
-    var SEARCH_WORD = {};
-    Index.keywords.forEach( (keyword) => {
-      SEARCH_WORD[keyword] = [];
-    });
+exports.initiateCrawl = function() {
+  return Promise.all(sites.map((site) => {
+    return new Promise((resolve, reject) => {
+      
+      var SEARCH_WORD = {};
+      Index.keywords.forEach( (keyword) => {
+        SEARCH_WORD[keyword] = [];
+      });
 
-    site = 'https://' + site;
-    url = new URL(site);
-    baseUrl = url.protocol + '//' + url.hostname;
-    SEARCH_WORD.hostname = url.hostname;
-    request(url.origin, function(error, response, body) {
-      if(response.statusCode !== 200) {
-        reject(error);
-      }
-      var $ = cheerio.load(body, {ignoreWhitespace: true});
-      var htmlBody = $('html > body');
-      var wordsFound = searchForWord(htmlBody, SEARCH_WORD);
-      console.log(wordsFound);
-      if(wordsFound.length > 0) {
-        var captured = captureDomNodes(url, wordsFound, $, null, SEARCH_WORD);
-        console.log(captured);
-        resolve(captured);
-      } else {
-        resolve([]);
-      }
-    });
+      site = 'https://' + site;
+      url = new URL(site);
+      baseUrl = url.protocol + '//' + url.hostname;
+      SEARCH_WORD.hostname = url.hostname;
+      request(url.origin, function(error, response, body) {
+        if(response.statusCode !== 200) {
+          reject(error);
+        }
+        var $ = cheerio.load(body, {ignoreWhitespace: true});
+        var htmlBody = $('html > body');
+        var wordsFound = searchForWord(htmlBody, SEARCH_WORD);
+        if(wordsFound.length > 0) {
+          var captured = captureDomNodes(url, wordsFound, $, null, SEARCH_WORD);
+          resolve(captured);
+        } else {
+          resolve([]);
+        }
+      });
+    })
+  }))
+  .then((result) => {
+    return Watson.toneAnalysis(result);
   })
-})).then((result) => {
-  Watson.toneAnalysis(result);
-});
+  .then((testresult) => {
+    return testresult;
+  });
+}
 
 function searchForWord(chunk, words) {
   var lowerChunk = chunk.text().toLowerCase();
@@ -70,3 +74,11 @@ function captureDomNodes(url, wordsFound, $, isChild, words) {
   });
   return words; 
 }
+
+// function collectInternalLinks($) {
+//     var relativeLinks = $("a[href^='/']");
+//     console.log("Found " + relativeLinks.length + " relative links on page");
+//     relativeLinks.each(function() {
+//         pagesToVisit.push(baseUrl + $(this).attr('href'));
+//     });
+// }

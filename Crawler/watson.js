@@ -1,10 +1,8 @@
 var watson = require('watson-developer-cloud');
 var Promise = require('bluebird');
 
-
 exports.toneAnalysis = function(data) {
-
-  console.log('-----------INSIDE WATSON ----------\n', data);
+  //TODO: Move credentials to env file and git ignore it
   var tone_analyzer = watson.tone_analyzer({
     url: 'https://gateway.watsonplatform.net/tone-analyzer/api',
     username: 'ac72f237-bca2-4ab7-819a-a5df2efa9d43',
@@ -13,55 +11,41 @@ exports.toneAnalysis = function(data) {
     version_date: '2016-05-19',
   });
 
-  cleanupData(data).then((concatData) => {
+  return cleanupInputData(data)
+  .then((concatData) => {
     var topics = []
     for (var property in concatData) {
-      topics.push([property, concatData[property]]);
+      topics.push([property, concatData[property], concatData[property].length]);
     }
-    console.log('topics', topics);
-    
-    Promise.all(
+    return topics;
+  })
+  .then((topics) => {
+    return Promise.all(
       topics.map((topic) => {
         return new Promise((resolve, reject) => {
-          tone_analyzer.tone({text: JSON.stringify(topic[1])}, (err, tone) => {
+          tone_analyzer.tone({ text: JSON.stringify(topic[1]), sentences: false }, (err, tone) => {
             if(err) {
               console.log('ERROR: ', err);
             } else {
               var answer = {};
               answer.keyword = topic[0];
+              answer.instances = topic[2];
               answer.watsonScore = tone;
               console.log('answer', answer);
               resolve(answer);
             }
-          });
-        });
+          })
+        })
       })
-    ).then((result) => console.log('--------------RESULT--------------', JSON.stringify(result)));
-
-
+    );
   })
-
-//   var watsonAnalysis = {};
-  cleanupData(data).then((concatData) => {
-    console.log('concat data: ', concatData);
-    var watsonAnalysis = {};
-    for(var property in concatData) {
-      if(concatData[property].length > 0) {
-        console.log('--------ANALYZE THE TONE HERE---------');
-        tone_analyzer.tone({text: JSON.stringify(concatData[property])}, (err, tone) => {
-          if(err) {
-            console.log('ERROR: ', err);
-          } else {
-            watsonAnalysis[property] = tone;
-          }
-        });
-      }
-    }
-    return watsonAnalysis;
-  }).then((result) => {console.log('watsonAnalysis: ', result)});
+  .then((result) => {
+    var cleanData = cleanupOutputData(result);
+    return cleanData;
+  });
 }
 
-function cleanupData(data){
+function cleanupInputData(data) {
   return new Promise((resolve, reject) => {
     var cleanData = data.reduce((acc, cur) => {
       for(var property in cur) {
@@ -77,4 +61,24 @@ function cleanupData(data){
     }, {});
     resolve(cleanData);
   });
+}
+
+function cleanupOutputData(data) {
+  return new Promise((resolve, reject) => {
+    var cleanData = data.map((element) => {
+      var obj = {};
+      obj.keyword = element.keyword;
+      obj.instances = element.instances;
+      obj.watsonCategoryRaw = element.watsonScore.document_tone.tone_categories;
+      obj.watsonToneAnger = obj.watsonCategoryRaw[0].tones[0].score;
+      obj.watsonToneDisgust = obj.watsonCategoryRaw[0].tones[1].score;
+      obj.watsonToneFear = obj.watsonCategoryRaw[0].tones[2].score;
+      obj.watsonToneJoy = obj.watsonCategoryRaw[0].tones[3].score;
+      obj.watsonToneSadness = obj.watsonCategoryRaw[0].tones[4].score;
+      obj.negativeScore = (obj.watsonToneAnger + obj.watsonToneDisgust + obj.watsonToneFear + obj.watsonToneSadness)/4;
+      obj.score = (obj.watsonToneJoy + objb.negativeScore)/2;
+      return obj;
+    });
+    resolve(cleanData);
+  })
 }
