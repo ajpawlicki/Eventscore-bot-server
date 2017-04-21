@@ -76,7 +76,7 @@ function cleanupOutputData(data) {
       obj.watsonToneJoy = obj.watsonCategoryRaw[0].tones[3].score;
       obj.watsonToneSadness = obj.watsonCategoryRaw[0].tones[4].score;
       obj.negativeScore = (obj.watsonToneAnger + obj.watsonToneDisgust + obj.watsonToneFear + obj.watsonToneSadness)/4;
-      obj.score = (obj.watsonToneJoy + objb.negativeScore)/2;
+      obj.score = (obj.watsonToneJoy + obj.negativeScore)/2;
       return obj;
     });
     resolve(cleanData);
