@@ -8,6 +8,7 @@ var Watson = require('../watson');
 var sites = [
   'www.reddit.com',
   'www.buzzfeed.com',
+  'en.wikipedia.org/wiki/Lady_Gaga',
   // 'news.ycombinator.com'
 ];
 
@@ -49,6 +50,9 @@ exports.initiateCrawl = function() {
   })
   .then((testresult) => {
     return testresult;
+  })
+  .catch((error) => {
+    return error;
   });
 }
 
@@ -66,7 +70,7 @@ function searchForWord(chunk, words) {
 
 //Note: This Works - DO NOT DELETE
 function captureDomNodes(url, wordsFound, $, isChild, words) {
-  var body = $('html > body').children().find('p,a,h1,h2,h3,h4,h5,h6,span');
+  var body = $('html > body').children().find('a,h1,h2,h3,h4,h5,h6');
   body.each(function(i, element) {
     var element = $(this).text().trim().toLowerCase();
     wordsFound.forEach(function(word) {
