@@ -59,12 +59,12 @@ function cleanupInputData(data) {
       }
       return acc;
     }, {});
-    var cleanDataRemove = for(var property in cleanData) {
+    for(var property in cleanData) {
       if(cleanData[property].length === 0) {
         delete cleanData[property];
       }
     }
-    resolve(cleanDataRemove);
+    resolve(cleanData);
   });
 }
 
