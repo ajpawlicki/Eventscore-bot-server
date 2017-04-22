@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 app.get('/api/crawl/keywords/:keywords', async (req, res) => {
   var keywords = req.params.keywords;
-  var splitKeywords = keywords.split('&');
+  var splitKeywords = keywords.split('^');
   Index.keywords = splitKeywords;
   var result = await Index.initiate();
   res.send(JSON.stringify(result, null, 2));
