@@ -6,9 +6,12 @@ var Index = require('../index');
 var Watson = require('../watson');
 
 var sites = [
-  'www.reddit.com',
-  'www.buzzfeed.com',
-  'en.wikipedia.org/wiki/Lady_Gaga',
+  // 'www.reddit.com',
+  // 'www.buzzfeed.com',
+  'www.rollingstone.com/music',
+  'www.mtv.com/news/music/',
+  'www.npr.org/sections/music-news/',
+  'www.billboard.com/news',
   // 'news.ycombinator.com'
 ];
 
@@ -45,10 +48,12 @@ exports.initiateCrawl = function() {
     })
   }))
   .then((result) => {
-    // return result;
-    return Watson.toneAnalysis(result);
+    // console.log('-------result-------\n', result);
+    return result;
+    // return Watson.toneAnalysis(result);
   })
   .then((testresult) => {
+    // console.log('-------testresult-------\n', testresult);    
     return testresult;
   })
   .catch((error) => {
