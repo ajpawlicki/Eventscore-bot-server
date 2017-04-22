@@ -35,6 +35,7 @@ exports.initiateCrawl = function() {
         var wordsFound = searchForWord(htmlBody, SEARCH_WORD);
         if(wordsFound.length > 0) {
           var captured = captureDomNodes(url, wordsFound, $, null, SEARCH_WORD);
+          // var captured = captureDomNodesRecursion(url, wordsFound, $, null, SEARCH_WORD);
           resolve(captured);
         } else {
           resolve([]);
@@ -43,7 +44,8 @@ exports.initiateCrawl = function() {
     })
   }))
   .then((result) => {
-    return Watson.toneAnalysis(result);
+    return result;
+    // return Watson.toneAnalysis(result);
   })
   .then((testresult) => {
     return testresult;
@@ -62,18 +64,43 @@ function searchForWord(chunk, words) {
   return foundKeywords;
 }
 
+//Note: This Works - DO NOT DELETE
 function captureDomNodes(url, wordsFound, $, isChild, words) {
-  var aBody = $('html > body').children().find('a');
-  aBody.each(function(i, element) {
-    var aElement = $(this).text().trim().toLowerCase();
+  var body = $('html > body').children().find('p,a,h1,h2,h3,h4,h5,h6,span');
+  body.each(function(i, element) {
+    var element = $(this).text().trim().toLowerCase();
     wordsFound.forEach(function(word) {
-      if(aElement.includes(word)) {
-        words[word].push(aElement);
+      if(element.includes(word)) {
+        words[word].push(element);
       }
     });
   });
+  console.log(words);
   return words; 
 }
+
+// function captureDomNodesRecursion(url, wordsFound, $, isChild, words) {
+//   var body = $('html > body')[0];
+//   console.log('----------BODY---------\n', body);
+//   var recursive = function(wordsFound, body, isChild) {
+//     for(var i=0; i<body.children.length; i++) {
+//       var childNode = body.children[i];
+
+//       //task
+//       // wordsFound.forEach(function(word) {
+//       //   if(childNode.includes(word)) {
+//       //     words[word].push(childNode);
+//       //   }
+//       // });
+//       console.log('childnode: ', childNode);
+//       if(childNode.children.length > 0){
+//         recursive(wordsFound, childNode, true);
+//       }
+//     }
+//   }
+//   recursive(wordsFound, body);
+//   return words;
+// }
 
 // function collectInternalLinks($) {
 //     var relativeLinks = $("a[href^='/']");
