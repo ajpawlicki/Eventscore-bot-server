@@ -20,6 +20,15 @@ app.get('/api/crawl/keywords/:keywords', async (req, res) => {
   res.send(JSON.stringify(result, null, 2));
 })
 
+// async function testing(){
+//   var result = await Index.initiate();
+//   console.log('--------result------------\n', result);
+//   var result2 = JSON.stringify(result, null, 2);
+//   console.log('--------result2------------\n', result2);  
+// }
+
+// testing();
+
 var port = process.env.PORT || 5000;
 app.listen(port);
 console.log('Listening on port', port);
