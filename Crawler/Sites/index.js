@@ -44,8 +44,8 @@ exports.initiateCrawl = function() {
     })
   }))
   .then((result) => {
-    return result;
-    // return Watson.toneAnalysis(result);
+    // return result;
+    return Watson.toneAnalysis(result);
   })
   .then((testresult) => {
     return testresult;
@@ -75,7 +75,6 @@ function captureDomNodes(url, wordsFound, $, isChild, words) {
       }
     });
   });
-  console.log(words);
   return words; 
 }
 
