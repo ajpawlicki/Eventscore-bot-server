@@ -45,12 +45,12 @@ exports.initiateCrawl = function() {
     })
   }))
   .then((result) => {
-    // console.log('-------result-------\n', result);
-    // return result;
-    return Watson.toneAnalysis(result);
+    console.log('-------result-------\n', result);
+    return result;
+    // return Watson.toneAnalysis(result);
   })
   .then((testresult) => {
-    // console.log('-------testresult-------\n', testresult);    
+    console.log('-------testresult-------\n', testresult);    
     return testresult;
   })
   .catch((error) => {
