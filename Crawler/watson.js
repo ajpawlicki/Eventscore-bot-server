@@ -4,11 +4,11 @@ var Promise = require('bluebird');
 exports.toneAnalysis = function(data) {
   //TODO: Move credentials to env file and git ignore it
   var tone_analyzer = watson.tone_analyzer({
-    url: 'https://gateway.watsonplatform.net/tone-analyzer/api',
-    username: 'ac72f237-bca2-4ab7-819a-a5df2efa9d43',
-    password: 'Cz8rt4v5sXWa',
-    version: 'v3',
-    version_date: '2016-05-19',
+    url: process.env.WATSON_URL,
+    username: process.env.WATSON_USERNAME,
+    password: process.env.WATSON_PASSWORD,
+    version: process.env.WATSON_VERSION,
+    version_date: process.env.WATSON_VERSION_DATE,
   });
 
   return cleanupInputData(data)
