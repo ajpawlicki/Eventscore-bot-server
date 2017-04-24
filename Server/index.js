@@ -18,6 +18,7 @@ app.get('/api/crawl/keywords/:keywords', async (req, res) => {
   Index.keywords = splitKeywords;
   var result = await Index.initiate();
   res.send(JSON.stringify(result, null, 2));
+  res.end();
 })
 
 // async function testing(){
