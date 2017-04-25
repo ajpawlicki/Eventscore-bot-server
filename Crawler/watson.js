@@ -26,6 +26,7 @@ exports.toneAnalysis = function(data) {
           tone_analyzer.tone({ text: JSON.stringify(topic[1]), sentences: false }, (err, tone) => {
             if(err) {
               console.log('ERROR: ', err);
+              reject(err)
             } else {
               var answer = {};
               answer.keyword = topic[0];

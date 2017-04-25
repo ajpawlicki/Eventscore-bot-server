@@ -15,12 +15,12 @@ app.use(bodyParser.json());
 app.get('/api/crawl/keywords/:keywords', async (req, res) => {
   var keywords = req.params.keywords;
   var splitKeywords = keywords.split('^');
-  Index.keywords = splitKeywords;
-  console.log('----------keywords has been split----------');
-  var result = await Index.initiate();
-  console.log('-----------result after awaiting for Index.initiate----------');
-  res.send(JSON.stringify(result, null, 2));
-  res.end();
+  // Index.keywords = splitKeywords;
+  // console.log('----------keywords has been split----------');
+  // var result = await Index.initiate();
+  // console.log('-----------result after awaiting for Index.initiate----------');
+  // res.send(JSON.stringify(result, null, 2));
+  res.send(splitKeywords);
 })
 
 // async function testing(){
